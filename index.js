@@ -2,7 +2,7 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const db = require('./db');
+const {db} = require('./db');
 const session = require('express-session');
 
 const port = 8080;
@@ -33,20 +33,32 @@ app.get('/fav', (req, res) => {
 app.put('/fav', (req, res) => {
     if (req.session.clientId){
         const film = req.body.film;
-        db.push(film);
+        const clientId = req.session.clientId;
+        db[clientId] = db[clientId] || [];
+        db[clientId].push(film);
     }   
     res.end();
 })
 app.delete('/fav', (req, res) => {
-    if (req.session.clientId){
+    const id = req.session.clientId
+    if (id){
         const filmId = req.body.filmId;
         for (let i = 0; i < db[id].length; i++)
-            if (db[id].id === filmId)
-                db.splice(i, 1);
+            if (db[id][i].id == filmId)
+                db[id].splice(i, 1);
     }    
     res.end();
 })
-
+app.post('/checkFav', (req, res) => {
+    const dbs = db[req.session.clientId];
+    let isFav = 0
+    if (dbs && dbs.length)
+        db[req.session.clientId].map(el => {
+            if (el.id == req.body.filmId)
+                isFav = 1
+        })
+    res.send(isFav.toString());
+})
 app.listen(port, () => {
     console.log('server run on port ' + port);
 });

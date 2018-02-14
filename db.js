@@ -1,4 +1,4 @@
-{
+exports.db = {
     "someId": [
         
     ]
