@@ -4,14 +4,24 @@ const app = express();
 const bodyParser = require('body-parser');
 const {db} = require('./db');
 const session = require('express-session');
+const MongoDbStore = require('connect-mongodb-session')(session);
+const mongoQueries = require('./mongodb/queries');
+const {conStr} = require('./config');
 
 const port = 8080;
+const store = new MongoDbStore({
+    uri: conStr,
+    collection: 'sessions'
+});
 
 app.use(express.static(path.join(__dirname, 'client', 'build')));
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(session({
-    secret: 'dsfsfwepefwkwfwe'
+    secret: 'dsfsfwepefwkwfwe',
+    store: store,
+    resave: true,
+    saveUninitialized: true
 }))
 // app.get('/', (req, res) => {
 //     console.log('yezzzzzz');
@@ -26,38 +36,23 @@ app.post('/sign_out', (req, res) => {
 })
 app.get('/fav', (req, res) => {
     const clientId = req.session.clientId
-    if (clientId)
-        res.send(JSON.stringify(db[clientId] ? db[clientId] : [])); return;
-    res.end();
+    if (clientId){
+        mongoQueries.getFavorites(req, res);
+    }
 })
 app.put('/fav', (req, res) => {
     if (req.session.clientId){
-        const film = req.body.film;
-        const clientId = req.session.clientId;
-        db[clientId] = db[clientId] || [];
-        db[clientId].push(film);
+        mongoQueries.addFavorite(req, res);
     }   
-    res.end();
 })
 app.delete('/fav', (req, res) => {
     const id = req.session.clientId
     if (id){
-        const filmId = req.body.filmId;
-        for (let i = 0; i < db[id].length; i++)
-            if (db[id][i].id == filmId)
-                db[id].splice(i, 1);
+        mongoQueries.removeFavorite(req, res);
     }    
-    res.end();
 })
 app.post('/checkFav', (req, res) => {
-    const dbs = db[req.session.clientId];
-    let isFav = 0
-    if (dbs && dbs.length)
-        db[req.session.clientId].map(el => {
-            if (el.id == req.body.filmId)
-                isFav = 1
-        })
-    res.send(isFav.toString());
+    mongoQueries.checkFavorite(req, res);    
 })
 app.listen(port, () => {
     console.log('server run on port ' + port);
