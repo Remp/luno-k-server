@@ -1,0 +1,1 @@
+After setting up project locally, change directory to /client and make pull request to https://github.com/Remp/luno-k, then in console type npm run build. After you can get back to root directory and run project

@@ -7,7 +7,7 @@ const MongoDbStore = require('connect-mongodb-session')(session);
 const mongoQueries = require('./mongodb/queries');
 const {conStr} = require('./config');
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 3000
 const store = new MongoDbStore({
     uri: conStr,
     collection: 'sessions'
