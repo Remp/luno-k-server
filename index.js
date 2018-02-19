@@ -7,7 +7,7 @@ const MongoDbStore = require('connect-mongodb-session')(session);
 const mongoQueries = require('./mongodb/queries');
 const {conStr} = require('./config');
 
-const port = 8080;
+const port = process.env.PORT || 5000
 const store = new MongoDbStore({
     uri: conStr,
     collection: 'sessions'
@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, 'client', 'build')));
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(session({
-    secret: 'dsfsfwepefwkwfwe',
+    secret: 'top secret',
     store: store,
     resave: true,
     saveUninitialized: true
