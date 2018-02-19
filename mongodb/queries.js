@@ -76,7 +76,7 @@ exports.getFavorites = function(req, res){
             req.send(err);
             return;
         } 
-        res.send(JSON.stringify(doc.favorites));           
+        res.send(JSON.stringify(doc ? doc.favorites : []));           
     })
 }
 exports.checkFavorite = function(req, res){

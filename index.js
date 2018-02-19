@@ -2,7 +2,6 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const {db} = require('./db');
 const session = require('express-session');
 const MongoDbStore = require('connect-mongodb-session')(session);
 const mongoQueries = require('./mongodb/queries');
@@ -23,10 +22,9 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }))
-// app.get('/', (req, res) => {
-//     console.log('yezzzzzz');
-//     res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
-// });
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+});
 app.post('/auth', (req, res) => {
     req.session.clientId = req.body;
     res.end();
